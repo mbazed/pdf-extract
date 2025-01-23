@@ -10,6 +10,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
+      "http://localhost:5173",
       "https://pdf-extract-api-2hqu.onrender.com",
       "https://pdf-extract-3251.onrender.com",
     ], // Replace with your frontend URL
