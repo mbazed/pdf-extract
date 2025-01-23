@@ -6,7 +6,9 @@ const FormData = require("form-data");
 const fs = require("fs");
 const path = require("path");
 const helmet = require("helmet");
-require("dotenv").config(); // To load environment variables from a .env file
+const tmp = require("tmp");
+
+// require("dotenv").config(); // To load environment variables from a .env file
 
 const app = express();
 app.use(cors());
@@ -104,13 +106,16 @@ app.post("/process-pdf", upload.single("file"), async (req, res) => {
       return res.status(400).json({ error: "No file uploaded" });
     }
 
-    // Create FormData for Python microservice
-    const formData = new FormData();
-    formData.append("file", fs.createReadStream(req.file.path));
+    // Create a temporary file
+    const tempFile = tmp.fileSync({ postfix: ".pdf" });
+    fs.writeFileSync(tempFile.name, req.file.buffer); // Write the uploaded file to the temp file
 
     // Extract text from Python service
+    const formData = new FormData();
+    formData.append("file", fs.createReadStream(tempFile.name));
+
     const pythonResponse = await axios.post(
-      "http://localhost:5000/extract_pdf",
+      "https://pdf-extract-3251.onrender.com/extract_pdf",
       formData,
       {
         headers: {
@@ -130,8 +135,8 @@ app.post("/process-pdf", upload.single("file"), async (req, res) => {
     // Extract details from NER results
     const details = extractDetailsFromNER(allNERResults, extractedText);
 
-    // Clean up uploaded file
-    fs.unlinkSync(req.file.path);
+    // Clean up temporary file
+    tempFile.removeCallback();
 
     // Send extracted details as JSON response
     res.json(details);
