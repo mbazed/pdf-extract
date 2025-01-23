@@ -1,14 +1,15 @@
 {
   "name": "api",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "A PDF processing API that extracts information using NER.",
   "dependencies": {
     "axios": "^0.21.1",
     "cors": "^2.8.5",
@@ -16,7 +17,6 @@
     "form-data": "^4.0.0",
     "helmet": "^8.0.0",
     "multer": "^1.4.2",
-    "nlpcloud": "^2.0.8",
     "tmp": "^0.2.3"
   }
 }
