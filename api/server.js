@@ -6,7 +6,16 @@ const FormData = require("form-data");
 const helmet = require("helmet");
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://pdf-extract-api-2hqu.onrender.com",
+    ], // Replace with your frontend URL
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 app.use(helmet()); // Adds security headers
 
 // Configure multer for file uploads using memory storage
