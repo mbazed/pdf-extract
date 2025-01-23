@@ -13,6 +13,7 @@ app.use(
       "http://localhost:5173",
       "https://pdf-extract-api-2hqu.onrender.com",
       "https://pdf-extract-3251.onrender.com",
+      "https://pdf-extract-frontend.vercel.app",
     ], // Replace with your frontend URL
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type", "Authorization"],
