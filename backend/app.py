@@ -2,13 +2,22 @@ import pdfplumber
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
-import tempfile  # Use for temporary file storage
+import tempfile
+import logging
 
 app = Flask(__name__)
 CORS(app)
 
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+
 # Port configuration for production (Render, etc.)
 PORT = int(os.environ.get('PORT', 5000))
+
+@app.route('/health', methods=['GET'])
+def health_check():
+    return jsonify({"status": "healthy"}), 200
+
 
 @app.route('/extract_pdf', methods=['POST'])
 def process_pdf():
@@ -33,10 +42,8 @@ def process_pdf():
             return jsonify({"text": full_text})
 
         except Exception as e:
-            # Handle specific errors and provide meaningful feedback
+            logging.error(f"Error processing PDF: {str(e)}")
             return jsonify({"error": str(e)}), 500
-
-        # No need for manual cleanup; TemporaryDirectory handles it automatically
 
 if __name__ == '__main__':
     # Disable debug mode for production
