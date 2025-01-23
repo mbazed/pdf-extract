@@ -11,6 +11,7 @@ app.use(
     origin: [
       "http://localhost:3000",
       "https://pdf-extract-api-2hqu.onrender.com",
+      "https://pdf-extract-3251.onrender.com",
     ], // Replace with your frontend URL
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type", "Authorization"],
