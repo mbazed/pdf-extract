@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import Spinner from "./components/Spinner";
 
 const PDFForm = () => {
   const [formData, setFormData] = useState({
@@ -13,11 +14,13 @@ const PDFForm = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null); // State to hold the selected file
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
+    setSelectedFile(file.name); // Set the name of the selected file
     setLoading(true);
     setError("");
 
@@ -26,7 +29,7 @@ const PDFForm = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/process-pdf",
+        "https://pdf-extract-api-2hqu.onrender.com/process-pdf",
         uploadFormData,
         {
           headers: {
@@ -35,10 +38,14 @@ const PDFForm = () => {
         }
       );
       console.log(response.data);
-      setFormData(response.data);
+      setFormData(response.data); // Set extracted data
+
+      // Optionally clear the file input and reset form data
+      event.target.value = null; // Clear the file input
+      setSelectedFile(null); // Reset the selected file
     } catch (err) {
       setError(
-        `Error processing PDF: ${err.response?.data?.message || err.message}`
+        `Error processing PDF: ${err.response?.data?.error || err.message}`
       );
       console.error(err);
     } finally {
@@ -56,21 +63,35 @@ const PDFForm = () => {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md shadow-lg">
         <CardHeader>
-          <CardTitle>PDF Information Extractor</CardTitle>
+          <CardTitle className="text-lg font-semibold">
+            PDF Information Extractor
+          </CardTitle>
+          <p className="text-sm text-gray-600">
+            Upload a PDF to extract information.
+          </p>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="file">Upload PDF</Label>
-              <Input
-                id="file"
-                type="file"
-                accept=".pdf"
-                onChange={handleFileUpload}
-                className="w-full"
-              />
+              <div className="flex items-center justify-between">
+                <Input
+                  id="file"
+                  type="file"
+                  accept=".pdf"
+                  onChange={handleFileUpload}
+                  className="hidden" // Hide the default input
+                />
+                <Button
+                  onClick={() => document.getElementById("file").click()} // Trigger file input click
+                  className="bg-black text-white"
+                >
+                  Browse
+                </Button>
+                <span className="text-gray-600">{selectedFile || "No file selected"}</span> {/* Display selected file name */}
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -81,6 +102,7 @@ const PDFForm = () => {
                 value={formData.name}
                 onChange={handleInputChange}
                 placeholder="Extracted name will appear here"
+                readOnly // Make it read-only since it's extracted
               />
             </div>
 
@@ -92,6 +114,7 @@ const PDFForm = () => {
                 value={formData.phone}
                 onChange={handleInputChange}
                 placeholder="Extracted phone number will appear here"
+                readOnly // Make it read-only since it's extracted
               />
             </div>
 
@@ -103,14 +126,21 @@ const PDFForm = () => {
                 value={formData.address}
                 onChange={handleInputChange}
                 placeholder="Extracted address will appear here"
+                readOnly // Make it read-only since it's extracted
               />
             </div>
 
             {loading && (
-              <div className="text-center text-blue-600">Processing PDF...</div>
+              <div className="flex justify-center">
+                <Spinner /> {/* Display the spinner while loading */}
+              </div>
             )}
 
-            {error && <div className="text-center text-red-600">{error}</div>}
+            {error && (
+              <div className="text-center text-red-600 font-semibold">
+                {error}
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
