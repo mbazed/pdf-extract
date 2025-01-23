@@ -1,3 +1,4 @@
 Flask==3.1.0
 Flask_Cors==5.0.0
 pdfplumber==0.11.5
+gunicorn==23.0.0
